@@ -552,6 +552,13 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("")}
         </ul>
       </div>
+      <div class="share-buttons">
+        <span class="share-label">Share:</span>
+        <button class="share-btn share-twitter" data-activity="${name}" aria-label="Share on Twitter/X" title="Share on Twitter/X">𝕏</button>
+        <button class="share-btn share-facebook" data-activity="${name}" aria-label="Share on Facebook" title="Share on Facebook">f</button>
+        <button class="share-btn share-whatsapp" data-activity="${name}" aria-label="Share on WhatsApp" title="Share on WhatsApp">💬</button>
+        <button class="share-btn share-copy" data-activity="${name}" aria-label="Copy link" title="Copy link">🔗</button>
+      </div>
       <div class="activity-card-actions">
         ${
           currentUser
@@ -587,7 +594,45 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    // Add click handlers for share buttons
+    activityCard.querySelectorAll(".share-btn").forEach((btn) => {
+      btn.addEventListener("click", (event) => {
+        handleShare(event, name, details);
+      });
+    });
+
     activitiesList.appendChild(activityCard);
+  }
+
+  // Handle sharing an activity to social platforms
+  function handleShare(event, name, details) {
+    const btn = event.currentTarget;
+    const pageUrl = window.location.href.split("?")[0];
+    const shareText = `Check out "${name}" at Mergington High School! ${details.description}`;
+
+    if (btn.classList.contains("share-twitter")) {
+      const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(pageUrl)}`;
+      window.open(url, "_blank", "noopener,noreferrer");
+    } else if (btn.classList.contains("share-facebook")) {
+      const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}&quote=${encodeURIComponent(shareText)}`;
+      window.open(url, "_blank", "noopener,noreferrer");
+    } else if (btn.classList.contains("share-whatsapp")) {
+      const url = `https://wa.me/?text=${encodeURIComponent(shareText + " " + pageUrl)}`;
+      window.open(url, "_blank", "noopener,noreferrer");
+    } else if (btn.classList.contains("share-copy")) {
+      navigator.clipboard.writeText(pageUrl).then(() => {
+        const original = btn.textContent;
+        btn.textContent = "✓";
+        setTimeout(() => {
+          btn.textContent = original;
+        }, 1500);
+      }).catch(() => {
+        btn.textContent = "✗";
+        setTimeout(() => {
+          btn.textContent = "🔗";
+        }, 1500);
+      });
+    }
   }
 
   // Event listeners for search and filter
